@@ -3,8 +3,7 @@
 // const fetch = require("node-fetch");
 let runfrequency=0;
 let numberofquestion=0;
-let 
-times=0;
+let times=0;
 let jason={};
 
 let zeesha = document.getElementById('zeeshan')
@@ -44,22 +43,22 @@ function createform_soul(times){
         form.setAttribute("id","dynamicForm");
         let rating = document.createElement("label");
         rating.setAttribute("for", "input_rating");
-        rating.innerHTML= "Range_of_Rating";
+        rating.innerHTML= "Rating";
         let input_rating = document.createElement("input");
         input_rating.setAttribute("id", "input_rating");
-        input_rating.setAttribute("name", "Range_of_Rating");
+        input_rating.setAttribute("name", "Rating");
         input_rating.setAttribute("type", "text");
         form.appendChild(rating);
         form.appendChild(input_rating);
-        let Implimentation = document.createElement("label");
-        Implimentation.setAttribute("for", "input_Implimentation");
-        Implimentation.innerHTML= "Implimentation";
-        let input_Implimentation = document.createElement("input");
-        input_Implimentation.setAttribute("id", "input_Implimentation");
-        input_Implimentation.setAttribute("name", "Implimentation");
-        input_Implimentation.setAttribute("type", "text");
-        form.appendChild(Implimentation);
-        form.appendChild(input_Implimentation);
+        let tag = document.createElement("label");
+        tag.setAttribute("for", "input_tag");
+        tag.innerHTML= "tag";
+        let input_tag = document.createElement("input");
+        input_tag.setAttribute("id", "input_tag");
+        input_tag.setAttribute("name", "tag");
+        input_tag.setAttribute("type", "text");
+        form.appendChild(tag);
+        form.appendChild(input_tag);
         div.appendChild(form);
         document.getElementById("formcontainer").appendChild(div);
         
@@ -91,18 +90,27 @@ function createJSON(){
     jason = JSON.stringify(jason_obj1);
     console.log(jason);
     let questions = fetchQuestion(jason);
-    Questions(questions);
+    // Questions(questions);
     
 
 
     //
     // return jason
 }
+var quest_automate_id = []
 
+
+// {
+//     {name:"",contestid:"",index:""},
+//     {name:"",contestid:"",index:""},
+//     {name:"",contestid:"",index:""},
+
+// }
+var questionContainer = document.getElementById('questionContainer')
 async function fetchQuestion(data){
     // data = await axios(endpoint,data)
-
-    await fetch('http://localhost:8100/sendData', {
+    questionContainer.innerHTML = ''
+    await fetch('http://localhost:8200/sendData', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -111,8 +119,16 @@ async function fetchQuestion(data){
     })
     .then(response => response.json())
     .then(data => {
+        quest_automate_id = []
+        console.log(data)
+        for(i in data){
+            quest_automate_id.push(data[i]); 
+            console.log(i) 
+            link = `<a href="https://codeforces.com/contest/${data[i].contestId}/problem/${data[i].index}" target="_blank">Link</a>`;
+
+            questionContainer.innerHTML+= `${data[i].name} - ${link}<br>`;
+        }
         console.log('Response from server:', data);
-        zeesha.innerHTML+=data+'<br>'+'Hi this is the name'
     })
     .catch(error => {
         console.error('Error:', error);
@@ -122,6 +138,38 @@ async function fetchQuestion(data){
 
     return data;
 }
+
+
+async function automateContest(){
+    var dataa = {
+        'Username' : document.getElementById('username'),
+        'Password': document.getElementById('password'),
+        'Contest Name':document.getElementById('contestName'),
+        'Contest Duration':document.getElementById('contestDuration')
+    }
+
+
+    dataa = JSON.stringify(dataa)
+    await fetch('http://localhost:8100/run-python-script', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: dataa
+    })
+    // .then(response => response.json())
+    // .then(data => {
+    //     console.log('Response from server:', data);
+    //     zeesha.innerHTML+=data+'<br>'+'Hi this is the name'
+    // })
+    // .catch(error => {
+    //     console.error('Error:', error);
+    // });
+
+
+}
+var button_contest = document.getElementById('button_contest').addEventListener('click',automateContest)
+
 
 function Questions(questions){
     let div = document.getElementById("questionContainer");
